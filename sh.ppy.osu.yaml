@@ -97,7 +97,8 @@ modules:
       - install -D -m 644 x-osu.xml /app/share/mime/packages/${FLATPAK_ID}.xml
       - install -D -m 644 sh.ppy.osu.appdata.xml /app/share/metainfo/sh.ppy.osu.appdata.xml
       # LatencyFleX
-      - sed -i -E "s|                \"library_path\": \"/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so\",|                \"library_path\": \"/app/lib/liblatencyflex_layer.so\",|g" layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
+      - |
+        sed -i -E "s|                \"library_path\": \"/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so\",|                \"library_path\": \"/app/lib/liblatencyflex_layer.so\",|g" layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
       - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "/app/lib/"
       - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "/app/share/vulkan/implicit_layer.d"
     sources:
