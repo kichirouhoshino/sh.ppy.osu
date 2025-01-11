@@ -96,15 +96,14 @@ modules:
       - ln -s /usr/lib/x86_64-linux-gnu/libasound.so.2 /app/bin/libasound.so
       - install -D -m 644 x-osu.xml /app/share/mime/packages/${FLATPAK_ID}.xml
       - install -D -m 644 sh.ppy.osu.appdata.xml /app/share/metainfo/sh.ppy.osu.appdata.xml
-
       # LatencyFleX
       - sh ./apply_extra.sh
-      - install -Dm644 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so /app/lib/liblatencyflex_layer.so
-      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json /app/share/vulkan/implicit_layer.d/latencyflex.json
+      - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "/app/lib/"
+      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "/app/share/vulkan/implicit_layer.d"
     sources:
       - type: file
-        url: https://github.com/ppy/osu/releases/download/2024.1115.2/osu.AppImage
-        sha256: d87d923dc526fc7ff40fd06a0624c5bda0b0774735e3fafea1687279974da685
+        url: https://github.com/ppy/osu/releases/download/2025.101.0/osu.AppImage
+        sha256: 1ac9d3c55a4d9364571cb113e9482fd3f64e96af11524c36657a918e453e773c
         dest-filename: osu.AppImage
         x-checker-data:
           type: json
