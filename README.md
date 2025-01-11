@@ -1,3 +1,11 @@
+## Personal osu! flatpak build
+This is my modification of the osu! flatpak with the following changes:
+- Running the game in native Wayland
+- LatencyFleX for lower latency (needs more testing)
+- Fix for screen tearing not enabling under vulkan renderer using libstrangle
+
+To make full use of this, make sure you are using Wayland and set the Renderer to "Vulkan (Experimental)" in osu! Settings.
+
 # osu!
 Keep in mind that the package is **not** official, there may be bugs specific to the flatpak. If you find such, report them here.
 > Note: This is osu!(lazer) - a future update which is yet to be considered mainstream. It is not osu!(stable).
