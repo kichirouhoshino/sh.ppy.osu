@@ -142,8 +142,6 @@ modules:
         path: ld.so.conf
       - type: file
         path: start-osu
-      - type: file
-        path: apply_extra.sh
       - type: archive
         url: https://github.com/ishitatsuyuki/LatencyFleX/releases/download/v0.1.1/latencyflex-v0.1.1.tar.xz
         sha256: c992ebd2f43c99ab4a84a6ffce692d9aae4cc2571536a5854ae2e79b6951e78a
