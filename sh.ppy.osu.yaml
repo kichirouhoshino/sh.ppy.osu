@@ -103,8 +103,8 @@ modules:
       - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "/app/share/vulkan/implicit_layer.d"
     sources:
       - type: file
-        url: https://github.com/ppy/osu/releases/download/2025.101.0/osu.AppImage
-        sha256: 1ac9d3c55a4d9364571cb113e9482fd3f64e96af11524c36657a918e453e773c
+        url: https://github.com/ppy/osu/releases/download/2025.118.3/osu.AppImage
+        sha256: 6e77df52dcece48b162a10067864edf941cc9a54d66db4fbf407387ca8572bdb
         dest-filename: osu.AppImage
         x-checker-data:
           type: json
