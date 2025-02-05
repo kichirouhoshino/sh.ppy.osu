@@ -54,6 +54,18 @@ modules:
         url: https://github.com/kichirouhoshino/libstrangle.git
         commit: d2c915e14c3051d154d080be1c27fa643d30e612
 
+  - name: latencyflex
+    buildsystem: simple
+    build-commands:
+      - |
+        sed -i -E "s|                \"library_path\": \"/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so\",|                \"library_path\": \"/app/lib/liblatencyflex_layer.so\",|g" layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
+      - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "/app/lib/"
+      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "/app/share/vulkan/implicit_layer.d"
+    sources:
+      - type: archive
+        url: https://github.com/ishitatsuyuki/LatencyFleX/releases/download/v0.1.1/latencyflex-v0.1.1.tar.xz
+        sha256: c992ebd2f43c99ab4a84a6ffce692d9aae4cc2571536a5854ae2e79b6951e78a
+
   - name: osu-lazer
     buildsystem: simple
     build-commands:
@@ -96,11 +108,6 @@ modules:
       - ln -s /usr/lib/x86_64-linux-gnu/libasound.so.2 /app/bin/libasound.so
       - install -D -m 644 x-osu.xml /app/share/mime/packages/${FLATPAK_ID}.xml
       - install -D -m 644 sh.ppy.osu.appdata.xml /app/share/metainfo/sh.ppy.osu.appdata.xml
-      # LatencyFleX
-      - |
-        sed -i -E "s|                \"library_path\": \"/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so\",|                \"library_path\": \"/app/lib/liblatencyflex_layer.so\",|g" layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
-      - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "/app/lib/"
-      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "/app/share/vulkan/implicit_layer.d"
     sources:
       - type: file
         url: https://github.com/ppy/osu/releases/download/2025.118.3/osu.AppImage
@@ -142,6 +149,3 @@ modules:
         path: ld.so.conf
       - type: file
         path: start-osu
-      - type: archive
-        url: https://github.com/ishitatsuyuki/LatencyFleX/releases/download/v0.1.1/latencyflex-v0.1.1.tar.xz
-        sha256: c992ebd2f43c99ab4a84a6ffce692d9aae4cc2571536a5854ae2e79b6951e78a
