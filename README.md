@@ -6,6 +6,12 @@ This is my modification of the osu! flatpak with the following changes:
 
 To make full use of this, make sure you are using Wayland and set the Renderer to "Vulkan (Experimental)" in osu! Settings.
 
+You can install it from my personal flatpak repo (remove the --user argument to install system-wide)
+``` bash
+flatpak remote-add --user roddy-flatpak https://kichirouhoshino.github.io/roddy-flatpaks/index.flatpakrepo
+flatpak install roddy-flatpak sh.ppy.osu
+```
+
 # osu!
 Keep in mind that the package is **not** official, there may be bugs specific to the flatpak. If you find such, report them here.
 > Note: This is osu!(lazer) - a future update which is yet to be considered mainstream. It is not osu!(stable).
