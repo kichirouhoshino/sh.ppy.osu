@@ -2,10 +2,10 @@
 Changes:
 - Launch with Wayland by default (with fallback to x11)
 - Launch with LatencyFleX for lower mouse latency
-- Improved audio latency under pipewire (only works with Default/ALSA and JACK audio output)
+- Improved audio latency under pipewire (only works with Pipewire audio server output)
 - Launch with libstrangle to fix issue where the vulkan renderer does not disable vsync (important for wayland)
 Notes:
-- To make full use of this, make sure to use the Vulkan Renderer
+- To make full use of this, make sure to set the renderer to "Vulkan" and set the Audio output to "Pipewire Audio Server"
 - Running under Wayland with fractional scaling causes osu! to incorrectly detect the resolution. Manually change it in the settings.
 - The files from the appimage are completely unmodified, changes are only made in the launch script
 

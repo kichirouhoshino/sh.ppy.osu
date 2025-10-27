@@ -7,16 +7,7 @@ done
 export OSU_EXTERNAL_UPDATE_PROVIDER=1
 export STRANGLE_NODLSYM=1
 export LFX=1
-
-# Fallback to X11 if Wayland fails
-if [ "$SDL_VIDEODRIVER" = "wayland" ] && ! [ "$WAYLAND_DISPLAY" ]; then
-    echo "Wayland not detected, falling back to X11"
-    export SDL_VIDEODRIVER=x11
-fi
-
-export PIPEWIRE_PROPS='{
-    node.latency=128/48000;
-    node.lock-quantum=true
-}'
+export SDL_VIDEODRIVER="wayland,x11"
+export PIPEWIRE_LATENCY="128/44100"
 
 strangle -v 0 /app/bin/osu! "$@"
