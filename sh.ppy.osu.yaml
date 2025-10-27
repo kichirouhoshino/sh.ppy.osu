@@ -43,6 +43,27 @@ modules:
       - -Ddocumentation=disabled
       - -Dtests=disabled
 
+  - name: libstrangle
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/kichirouhoshino/libstrangle.git
+        branch: master
+    build-commands:
+      - make install prefix=/app
+
+  - name: latencyflex
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://github.com/ishitatsuyuki/LatencyFleX/releases/download/v0.1.1/latencyflex-v0.1.1.tar.xz
+        sha256: c992ebd2f43c99ab4a84a6ffce692d9aae4cc2571536a5854ae2e79b6951e78a
+    build-commands:
+      - |
+         sed -i -E 's|                "library_path": "/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so",|                "library_path": "/app/lib/liblatencyflex_layer.so",|g' layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
+      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "$FLATPAK_DEST/share/vulkan/implicit_layer.d"
+      - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "$FLATPAK_DEST/lib"
+
   - name: osu-lazer
     buildsystem: simple
     build-commands:

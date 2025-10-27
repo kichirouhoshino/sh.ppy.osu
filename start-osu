@@ -5,5 +5,18 @@ for i in {0..9}; do
 done
 
 export OSU_EXTERNAL_UPDATE_PROVIDER=1
+export STRANGLE_NODLSYM=1
+export LFX=1
 
-exec '/app/bin/osu!' "$@"
+# Fallback to X11 if Wayland fails
+if [ "$SDL_VIDEODRIVER" = "wayland" ] && ! [ "$WAYLAND_DISPLAY" ]; then
+    echo "Wayland not detected, falling back to X11"
+    export SDL_VIDEODRIVER=x11
+fi
+
+export PIPEWIRE_PROPS='{
+    node.latency=128/48000;
+    node.lock-quantum=true
+}'
+
+strangle -v 0 /app/bin/osu! "$@"
