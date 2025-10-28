@@ -1,11 +1,12 @@
 ## My modified version of the osu!lazer flatpak
-Changes:
+### Changes:
 - Launch with Wayland by default (with fallback to x11)
 - Launch with LatencyFleX for lower mouse latency
-- Improved audio latency under pipewire (only works with Pipewire audio server output)
+- Improved audio latency under pipewire
 - Launch with libstrangle to fix issue where the vulkan renderer does not disable vsync (important for wayland)
-Notes:
-- To make full use of this, make sure to set the renderer to "Vulkan" and set the Audio output to "Pipewire Audio Server"
+### Notes:
+- Make sure to set the renderer to "Vulkan Renderer" for the v-sync fix and LatencyFleX to work
+- Set the Audio output to "Pipewire Sound Server" to take advantage of low latency audio
 - Running under Wayland with fractional scaling causes osu! to incorrectly detect the resolution. Manually change it in the settings.
 - The files from the appimage are completely unmodified, changes are only made in the launch script
 
