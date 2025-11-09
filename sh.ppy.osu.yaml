@@ -51,7 +51,18 @@ modules:
         url: https://github.com/kichirouhoshino/libstrangle.git
         branch: master
     build-commands:
-      - make install prefix=/app
+      - |
+         set -e
+         make
+         # Stage install to the Flatpak build root instead of writing to the host
+         make install DESTDIR="$FLATPAK_DEST" prefix=/app
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/doc
+      - /share/man
+      - /lib/*.la
+      - /lib/*.a
 
   - name: latencyflex
     buildsystem: simple
@@ -61,9 +72,37 @@ modules:
         sha256: c992ebd2f43c99ab4a84a6ffce692d9aae4cc2571536a5854ae2e79b6951e78a
     build-commands:
       - |
-         sed -i -E 's|                "library_path": "/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so",|                "library_path": "/app/lib/liblatencyflex_layer.so",|g' layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
-      - install -Dm644 layer/usr/share/vulkan/implicit_layer.d/latencyflex.json -t "$FLATPAK_DEST/share/vulkan/implicit_layer.d"
-      - install -Dm755 layer/usr/lib/x86_64-linux-gnu/liblatencyflex_layer.so -t "$FLATPAK_DEST/lib"
+         set -e
+         # Find the built layer .so in an arch-agnostic way
+         LIB=$(find layer -type f -name 'liblatencyflex_layer.so' | head -n1)
+         if [ -z "$LIB" ]; then
+           echo "ERROR: liblatencyflex_layer.so not found" >&2
+           exit 1
+         fi
+
+         JSON=layer/usr/share/vulkan/implicit_layer.d/latencyflex.json
+         if [ ! -f "$JSON" ]; then
+           echo "ERROR: $JSON not found" >&2
+           exit 1
+         fi
+
+         # Update JSON to reference the /app/lib path using basename in case of subdirs
+         sed -i -E "s|\"library_path\": \".+liblatencyflex_layer.so\"|\"library_path\": \"/app/lib/$(basename \"$LIB\")\"|g" "$JSON"
+         install -Dm644 "$JSON" "$FLATPAK_DEST/share/vulkan/implicit_layer.d/latencyflex.json"
+
+         install -Dm755 "$LIB" "$FLATPAK_DEST/lib/$(basename "$LIB")"
+
+         # Optional: strip to reduce size if strip is available
+         if command -v strip >/dev/null 2>&1; then
+           strip --strip-unneeded "$FLATPAK_DEST/lib/$(basename "$LIB")" || true
+         fi
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/doc
+      - /share/man
+      - /lib/*.la
+      - /lib/*.a
 
   - name: osu-lazer
     buildsystem: simple
