@@ -54,8 +54,9 @@ modules:
       - |
          set -e
          make
-         # Stage install to the Flatpak build root instead of writing to the host
-         make install DESTDIR="$FLATPAK_DEST" prefix=/app
+         # Stage install into the buildroot's app directory so files end up at /app/<...>
+         # Use DESTDIR pointing at $FLATPAK_DEST/app and prefix=/ so we avoid creating /app/app
+         make install DESTDIR="$FLATPAK_DEST/app" prefix=/
     cleanup:
       - /include
       - /lib/pkgconfig
@@ -88,9 +89,10 @@ modules:
 
          # Update JSON to reference the /app/lib path using basename in case of subdirs
          sed -i -E "s|\"library_path\": \".+liblatencyflex_layer.so\"|\"library_path\": \"/app/lib/$(basename \"$LIB\")\"|g" "$JSON"
-         install -Dm644 "$JSON" "$FLATPAK_DEST/share/vulkan/implicit_layer.d/latencyflex.json"
+         install -Dm644 "$JSON" "$FLATPAK_DEST/app/share/vulkan/implicit_layer.d/latencyflex.json"
 
-         install -Dm755 "$LIB" "$FLATPAK_DEST/lib/$(basename "$LIB")"
+         # Install into the app lib dir so runtime path is /app/lib
+         install -Dm755 "$LIB" "$FLATPAK_DEST/app/lib/$(basename "$LIB")"
 
          # Optional: strip to reduce size if strip is available
          if command -v strip >/dev/null 2>&1; then
