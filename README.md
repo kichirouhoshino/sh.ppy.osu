@@ -1,3 +1,16 @@
+## My edit of the osu!lazer flatpak
+### Changes:
+- Add LatencyFleX
+- libstrangle for more flexible framerate capping (useful for VRR)
+- Stuttering fixes for Vulkan Renderer
+- Additional envvars for lower latency (adjustable using Flatseal or similar methods)
+### Notes
+- Make sure the game renderer is set to Vulkan.
+- Set your preferred STRANGLE_FPS cap, PIPEWIRE_LATENCY (For PipeWire output, default) and PULSE_LATENCY_MSEC (For PulseAudio output) variables using something like Flatseal.
+- You can reduce audio stutters and xruns caused by low latency by configuring pipewire to dynamically switch between 44100Hz and 48000Hz. Due to how osu audio works, it only outputs at 44100Hz, which causes pipewire to resample the audio. If you do configure pipewire, make sure to launch osu first before playing any other audio to prioritize 44100Hz.
+- You can also play around with direct ALSA output, but I have not tested it myself. PipeWire is already low-latency enough for me.
+
+
 # osu!
 Keep in mind that the package is **not** official, there may be bugs specific to the flatpak. If you find such, report them here.
 > Note: This is osu!(lazer) - a future update which is yet to be considered mainstream. It is not osu!(stable).

@@ -6,4 +6,8 @@ done
 
 export OSU_EXTERNAL_UPDATE_PROVIDER=1
 
+if [ -n "$STRANGLE_FPS" ] && [ "$STRANGLE_FPS" != "0" ]; then
+   exec /app/bin/strangle /app/bin/osu! "$@"
+fi
+
 exec '/app/bin/osu!' "$@"

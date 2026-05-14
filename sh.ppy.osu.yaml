@@ -24,8 +24,39 @@ finish-args:
   - --filesystem=~/.wine:ro
   - --filesystem=~/.osu:ro
   - --filesystem=~/.local/share/osu-wine:ro
+  - --filesystem=xdg-run/pipewire-0:ro
+  - --env=STRANGLE_FPS=0
+  - --env=PIPEWIRE_LATENCY=64/44100
+  - --env=PULSE_LATENCY_MSEC=1
+  - --env=vk_wsi_disable_unordered_submits=true
+  - --env=SDL_AUDIODRIVER=pipewire
+  - --env=SDL_VIDEODRIVER=wayland,x11
+  - --env=STRANGLE_NODLSYM=1
+  - --env=LFX=1
 command: start-osu
 modules:
+  - name: libstrangle
+    buildsystem: simple
+    build-commands:
+      - make install-common install-libs prefix=/app DESTDIR=
+    sources:
+      - type: git
+        url: https://github.com/kichirouhoshino/libstrangle.git
+        commit: 334484fb04bc4ecfe273175d492164620c3ae229
+
+  - name: latencyflex
+    buildsystem: meson
+    subdir: layer
+    sources:
+      - type: git
+        url: https://github.com/ishitatsuyuki/LatencyFleX.git
+        commit: b677c2e41f425a3d4c80ab099a2687479e1b35ef
+      - type: file
+        url: https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/v1.3.268/layers/vulkan/generated/vk_layer_dispatch_table.h
+        sha256: 9651a2c40598f18503c2febc7ff46a78af2d145c493aef657ee21c212131a870
+        dest: layer/vulkan/generated
+        dest-filename: vk_layer_dispatch_table.h
+
   - name: libevdev
     buildsystem: meson
     cleanup:
@@ -61,7 +92,6 @@ modules:
         /app/share/applications/sh.ppy.osu.desktop
       - desktop-file-edit --set-key="X-Flatpak-RenamedFrom" --set-value="osu!.desktop"
         /app/share/applications/sh.ppy.osu.desktop
-      - install -D -m 644 ld.so.conf /app/etc/ld.so.conf
       - install -m 755 start-osu /app/bin/start-osu
         # app icons
       - install -D -m 644 osu-512.png /app/share/icons/hicolor/512x512/apps/sh.ppy.osu.png
