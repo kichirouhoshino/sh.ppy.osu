@@ -25,14 +25,17 @@ finish-args:
   - --filesystem=~/.osu:ro
   - --filesystem=~/.local/share/osu-wine:ro
   - --filesystem=xdg-run/pipewire-0:ro
-  - --env=STRANGLE_FPS=0
-  - --env=PIPEWIRE_LATENCY=64/44100
-  - --env=PULSE_LATENCY_MSEC=1
-  - --env=vk_wsi_disable_unordered_submits=true
-  - --env=SDL_AUDIODRIVER=pipewire
-  - --env=SDL_VIDEODRIVER=wayland,x11
-  - --env=STRANGLE_NODLSYM=1
-  - --env=LFX=1
+  # Environment Variables adjustable via Flatseal or similar means
+  - --env=STRANGLE_FPS=0 # Framerate cap. Make sure to set framelimit to unlimited in game settings
+  - --env=PIPEWIRE_LATENCY=64/44100 # Adjust the XX/44100 divisible by 4. For PipeWire output
+  - --env=PULSE_LATENCY_MSEC=1 # Adjust when needed. For PulseAudio output
+  - --env=vk_wsi_disable_unordered_submits=true # Fix for stuttering on vulkan renderer
+  - --env=SDL_AUDIODRIVER=pipewire # Forces pipewire audio output. Not sure if it works.
+  - --env=SDL_VIDEODRIVER=wayland,x11 # Forces wayland, fallback to x11
+  - --env=STRANGLE_NODLSYM=1 # Fix for crash when applying framecap on OpenGL renderer
+  - --env=LFX=1 # LatencyFleX
+  - --env=OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=2 # Internally change the BASS latency. Increase if you encounter cracking. Will be a permanent setting in osu.
+
 command: start-osu
 modules:
   - name: libstrangle
@@ -113,6 +116,10 @@ modules:
       - rm -r /app/share/icons/breeze/*/apps
         # See https://github.com/flathub/flathub/pull/2619#issuecomment-971378698
       - ln -s /usr/lib/x86_64-linux-gnu/libasound.so.2 /app/bin/libasound.so
+      - ln -sf /usr/lib/x86_64-linux-gnu/libSDL3.so.0 /app/bin/libSDL3.so
+      - ln -sf /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0 /app/bin/libSDL2.so
+      - printf '#!/bin/sh\nexit 0\n' > /app/bin/udevadm
+      - chmod +x /app/bin/udevadm
       - install -D -m 644 x-osu.xml /app/share/mime/packages/${FLATPAK_ID}.xml
       - install -D -m 644 sh.ppy.osu.appdata.xml /app/share/metainfo/sh.ppy.osu.appdata.xml
     sources:

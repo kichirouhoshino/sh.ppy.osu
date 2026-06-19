@@ -4,11 +4,22 @@
 - libstrangle for more flexible framerate capping (useful for VRR)
 - Stuttering fixes for Vulkan Renderer
 - Additional envvars for lower latency (adjustable using Flatseal or similar methods)
+### Environment Variables
+You can change these freely using Flatseal or KDE Plasma's flatpak settings. Or the CLI too.
+  - `STRANGLE_FPS=0` Framerate cap. Make sure to set framelimit to unlimited in game settings
+  - `PIPEWIRE_LATENCY=64/44100` - Adjust the XX/44100 divisible by 4. For PipeWire output.
+  - `PULSE_LATENCY_MSEC=1` - Adjust when needed. For PulseAudio output
+  - `vk_wsi_disable_unordered_submits=true` - Fix for stuttering on vulkan renderer. May become obsolete in the future.
+  - `SDL_AUDIODRIVER=pipewire` - Forces pipewire audio output. Not sure if it works.
+  - `SDL_VIDEODRIVER=wayland,x11` - Forces wayland, fallback to x11
+  - `STRANGLE_NODLSYM=1` - Fix for crash when applying framecap on OpenGL renderer
+  - `LFX=1` - LatencyFleX
+  - `SU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=2` - Internally change the BASS latency. Increase if you encounter cracking. Will be a permanent setting in osu.
 ### Notes
 - Make sure the game renderer is set to Vulkan.
-- Set your preferred STRANGLE_FPS cap, PIPEWIRE_LATENCY (For PipeWire output, default) and PULSE_LATENCY_MSEC (For PulseAudio output) variables using something like Flatseal.
+- I recommend setting you audio output to PipeWire in the game settings. You can also mess around with the direct ALSA output.
 - You can reduce audio stutters and xruns caused by low latency by configuring pipewire to dynamically switch between 44100Hz and 48000Hz. Due to how osu audio works, it only outputs at 44100Hz, which causes pipewire to resample the audio. If you do configure pipewire, make sure to launch osu first before playing any other audio to prioritize 44100Hz.
-- You can also play around with direct ALSA output, but I have not tested it myself. PipeWire is already low-latency enough for me.
+- Realtime is recommeded to reduce audio crackles on certain setups. Consult your distro documentation on how to do it.
 
 
 # osu!
