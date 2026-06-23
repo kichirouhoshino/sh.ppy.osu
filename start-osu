@@ -1,13 +1,59 @@
 #!/usr/bin/sh
+
+# ── Discord Rich Presence socket symlinks ────────────────────────────────────
 for i in {0..9}; do
-   test -S "$XDG_RUNTIME_DIR"/discord-ipc-$i || ln -sf {app/com.discordapp.Discord,"$XDG_RUNTIME_DIR"}/discord-ipc-$i;
-   test -S "$XDG_RUNTIME_DIR"/discord-ipc-$i || ln -sf {app/com.discordapp.DiscordCanary,"$XDG_RUNTIME_DIR"}/discord-ipc-$i;
+    test -S "$XDG_RUNTIME_DIR"/discord-ipc-$i || ln -sf {app/com.discordapp.Discord,"$XDG_RUNTIME_DIR"}/discord-ipc-$i
+    test -S "$XDG_RUNTIME_DIR"/discord-ipc-$i || ln -sf {app/com.discordapp.DiscordCanary,"$XDG_RUNTIME_DIR"}/discord-ipc-$i
 done
 
 export OSU_EXTERNAL_UPDATE_PROVIDER=1
 
+# ── Launch config GUI ────────────────────────────────────────────────────────
+python3 /app/bin/osu-config.py
+if [ $? -ne 0 ]; then
+    # User cancelled — do not launch osu
+    exit 0
+fi
+
+# ── Read saved config ────────────────────────────────────────────────────────
+CONFIG_FILE="$HOME/.var/app/sh.ppy.osu/config/osu-launch-config.ini"
+
+cfg_get() {
+    # cfg_get KEY DEFAULT
+    if [ -f "$CONFIG_FILE" ]; then
+        val=$(grep -i "^$1\s*=" "$CONFIG_FILE" | head -1 | sed 's/^[^=]*=\s*//' | tr -d '\r')
+        if [ -n "$val" ]; then
+            echo "$val"
+            return
+        fi
+    fi
+    echo "$2"
+}
+
+STRANGLE_FPS=$(cfg_get strangle_fps 0)
+FORCE_WAYLAND=$(cfg_get force_wayland false)
+ENABLE_LFX=$(cfg_get enable_lfx false)
+PIPEWIRE_LATENCY=$(cfg_get pipewire_latency 64)
+PULSE_LATENCY_MSEC=$(cfg_get pulse_latency_msec 1)
+BASS_DEV_PERIOD=$(cfg_get bass_dev_period 2)
+
+# ── Apply env vars ───────────────────────────────────────────────────────────
+export STRANGLE_FPS="$STRANGLE_FPS"
+export PIPEWIRE_LATENCY="${PIPEWIRE_LATENCY}/44100"
+export PULSE_LATENCY_MSEC="$PULSE_LATENCY_MSEC"
+export OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD="$BASS_DEV_PERIOD"
+
+if [ "$FORCE_WAYLAND" = "true" ]; then
+    export SDL_VIDEODRIVER="wayland,x11"
+fi
+
+if [ "$ENABLE_LFX" = "true" ]; then
+    export LFX=1
+fi
+
+# ── Launch osu ───────────────────────────────────────────────────────────────
 if [ -n "$STRANGLE_FPS" ] && [ "$STRANGLE_FPS" != "0" ]; then
-   exec /app/bin/strangle /app/bin/osu! "$@"
+    exec /app/bin/strangle /app/bin/osu! "$@"
 fi
 
 exec '/app/bin/osu!' "$@"

@@ -25,16 +25,11 @@ finish-args:
   - --filesystem=~/.osu:ro
   - --filesystem=~/.local/share/osu-wine:ro
   - --filesystem=xdg-run/pipewire-0:ro
-  # Environment Variables adjustable via Flatseal or similar means
-  - --env=STRANGLE_FPS=0 # Framerate cap. Make sure to set framelimit to unlimited in game settings
-  - --env=PIPEWIRE_LATENCY=64/44100 # Adjust the XX/44100 divisible by 4. For PipeWire output
-  - --env=PULSE_LATENCY_MSEC=1 # Adjust when needed. For PulseAudio output
-  - --env=vk_wsi_disable_unordered_submits=true # Fix for stuttering on vulkan renderer
-  - --env=SDL_AUDIODRIVER=pipewire # Forces pipewire audio output. Not sure if it works.
-  - --env=SDL_VIDEODRIVER=wayland,x11 # Forces wayland, fallback to x11
+  # Static env vars — do not remove
   - --env=STRANGLE_NODLSYM=1 # Fix for crash when applying framecap on OpenGL renderer
-  - --env=LFX=1 # LatencyFleX
-  - --env=OSU_TEMP_TESTING_BASS_CONFIG_DEV_PERIOD=2 # Internally change the BASS latency. Increase if you encounter cracking. Will be a permanent setting in osu.
+  - --env=vk_wsi_disable_unordered_submits=true # Fix for stuttering on Vulkan renderer
+  # All other launch options (framerate cap, audio latency, renderer, etc.) are
+  # configured via the osu-config GUI that runs before the game launches.
 
 command: start-osu
 modules:
@@ -77,6 +72,23 @@ modules:
       - -Ddocumentation=disabled
       - -Dtests=disabled
 
+  - name: python3-pycairo
+    buildsystem: meson
+    sources:
+      - type: archive
+        url: https://files.pythonhosted.org/packages/22/d9/1728840a22a4ef8a8f479b9156aa2943cd98c3907accd3849fb0d5f82bfd/pycairo-1.29.0.tar.gz
+        sha256: f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5bd3142
+
+  - name: python3-pygobject
+    buildsystem: meson
+    config-opts:
+      - -Dpython.bytecompile=2
+      - -Dtests=false
+    sources:
+      - type: archive
+        url: https://files.pythonhosted.org/packages/da/61/978c5fbca34f10a90df362502fbb5a005637909e7b5a0e9212349ea9d010/pygobject-3.56.3.tar.gz
+        sha256: 12760e4a0e3d04b6eb95e06f7a27e362c826d567ea613373a92c003b6c70d2d6
+
   - name: osu-lazer
     buildsystem: simple
     build-commands:
@@ -96,6 +108,7 @@ modules:
       - desktop-file-edit --set-key="X-Flatpak-RenamedFrom" --set-value="osu!.desktop"
         /app/share/applications/sh.ppy.osu.desktop
       - install -m 755 start-osu /app/bin/start-osu
+      - install -m 755 osu-config.py /app/bin/osu-config.py
         # app icons
       - install -D -m 644 osu-512.png /app/share/icons/hicolor/512x512/apps/sh.ppy.osu.png
       - install -D -m 644 osu-256.png /app/share/icons/hicolor/256x256/apps/sh.ppy.osu.png
@@ -124,8 +137,8 @@ modules:
       - install -D -m 644 sh.ppy.osu.appdata.xml /app/share/metainfo/sh.ppy.osu.appdata.xml
     sources:
       - type: file
-        url: https://github.com/ppy/osu/releases/download/2026.518.0-lazer/osu.AppImage
-        sha256: e0b2cd8eb284052efb2c86eaf8ee97a718fa0afb9f18302936ab3ad473762660
+        url: https://github.com/ppy/osu/releases/download/2026.620.0-lazer/osu.AppImage
+        sha256: acba26fd4c2a54e5d493f6b22ef7a4450303e3da79301f4103a442a21b6e3df8
         dest-filename: osu.AppImage
         x-checker-data:
           type: json
@@ -160,6 +173,6 @@ modules:
       - type: file
         path: sh.ppy.osu.appdata.xml
       - type: file
-        path: ld.so.conf
-      - type: file
         path: start-osu
+      - type: file
+        path: osu-config.py
