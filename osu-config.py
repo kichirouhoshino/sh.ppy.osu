@@ -69,28 +69,44 @@ def save_config(cfg):
         cfg.write(f)
 
 
-def set_framework_ini_value(key, value):
-    """Set a key=value pair in framework.ini, preserving other keys."""
-    path = get_framework_ini_path()
+def _read_framework_ini(path):
+    """Return an ordered dict of existing key=value pairs from framework.ini."""
     cfg = configparser.RawConfigParser()
-    cfg.optionxform = str  # preserve key case
-
+    cfg.optionxform = str  # preserve case
     if os.path.isfile(path):
         with open(path, "r") as f:
-            raw = f.read()
-        # framework.ini has no section header — add one for parsing
-        cfg.read_string("[root]\n" + raw)
+            cfg.read_string("[root]\n" + f.read())
     else:
         cfg.read_string("[root]\n")
-
     if not cfg.has_section("root"):
         cfg.add_section("root")
-    cfg.set("root", key, value)
+    return cfg
 
-    lines = [f"{k} = {v}" for k, v in cfg.items("root")]
+
+def _write_framework_ini(path, cfg):
+    """Write cfg back to framework.ini without a section header."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    lines = [f"{k} = {v}" for k, v in cfg.items("root")]
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def set_framework_ini_value(key, value):
+    """Set a single key=value pair in framework.ini."""
+    path = get_framework_ini_path()
+    cfg = _read_framework_ini(path)
+    cfg.set("root", key, value)
+    _write_framework_ini(path, cfg)
+
+
+def init_framework_ini(values: dict):
+    """Create framework.ini (and its parent osu folder) from scratch with the
+    given key/value pairs. Called on first launch when the file doesn't exist."""
+    path = get_framework_ini_path()
+    cfg = _read_framework_ini(path)  # starts empty if file missing
+    for key, value in values.items():
+        cfg.set("root", key, value)
+    _write_framework_ini(path, cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -416,13 +432,28 @@ class OsuConfigWindow(Gtk.Window):
         s["enable_lfx"] = str(self.w_lfx.get_active()).lower()
         save_config(self.cfg)
 
-        # Apply framework.ini changes for boolean "force" settings
-        if self.w_unlimited.get_active():
-            set_framework_ini_value("FrameSync", "Unlimited")
-        if self.w_force_pw.get_active():
-            set_framework_ini_value("AudioDevice", "PipeWire Sound Server")
-        if self.w_vulkan.get_active():
-            set_framework_ini_value("Renderer", "Deferred_Vulkan")
+        framework_ini = get_framework_ini_path()
+        first_launch = not os.path.isfile(framework_ini)
+
+        if first_launch:
+            # Build all framework.ini values from the current toggle state in one shot
+            initial_values = {}
+            if self.w_unlimited.get_active():
+                initial_values["FrameSync"] = "Unlimited"
+            if self.w_force_pw.get_active():
+                initial_values["AudioDevice"] = "PipeWire Sound Server"
+            if self.w_vulkan.get_active():
+                initial_values["Renderer"] = "Deferred_Vulkan"
+            if initial_values:
+                init_framework_ini(initial_values)
+        else:
+            # File already exists — update only the enabled keys, leave everything else
+            if self.w_unlimited.get_active():
+                set_framework_ini_value("FrameSync", "Unlimited")
+            if self.w_force_pw.get_active():
+                set_framework_ini_value("AudioDevice", "PipeWire Sound Server")
+            if self.w_vulkan.get_active():
+                set_framework_ini_value("Renderer", "Deferred_Vulkan")
 
 
 # ---------------------------------------------------------------------------
