@@ -284,7 +284,7 @@ class OsuConfigWindow(Gtk.Window):
         self.w_bass = self._spin_row(
             settings_box, "BASS Audio Latency (game-side)",
             "Internal BASS latency. Increase if you get audio cracking. A pop-up will appear on osu launch — safe to ignore.",
-            value=int(s.get("bass_dev_period", 2)), min_val=1, max_val=100,
+            value=int(s.get("bass_dev_period", 2)), min_val=-100, max_val=100,
         )
 
         # ---- Section: Renderer ----
