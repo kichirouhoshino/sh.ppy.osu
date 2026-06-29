@@ -5,6 +5,9 @@ APP_ID="sh.ppy.osu"
 MANIFEST="${APP_ID}.yaml"
 BUILD_DIR="build-dir"
 
+echo "Checking for osu!lazer AppImage updates..."
+./.update-appimage-info.sh
+
 echo "Building and installing ${APP_ID}..."
 
 # Build the flatpak and install it for the current user
