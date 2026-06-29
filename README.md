@@ -5,6 +5,7 @@
 - Forcing Vulkan and wayland by default. Stuttering fixes for Vulkan Renderer
 - Uses the flatpak runtime's SDL libraries over the appimage ones.
 - Additional settings for audio latency.
+- Changed osu's temp directory to allow external beatmap editing on flatpak
 
 A config GUI also appears that allows setting some stuff before the game launches.
 

@@ -8,6 +8,11 @@ done
 
 export OSU_EXTERNAL_UPDATE_PROVIDER=1
 
+# ── Setup temporary directory visible to host for external open ──────────────
+export TMPDIR="${XDG_CACHE_HOME:-$HOME/.var/app/sh.ppy.osu/cache}/tmp"
+mkdir -p "$TMPDIR"
+
+
 # ── Launch config GUI ────────────────────────────────────────────────────────
 python3 /app/bin/osu-config.py
 if [ $? -ne 0 ]; then
